@@ -84,7 +84,7 @@ public class OCRActivity extends AppCompatActivity {
 
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
-        Toast.makeText(this, "Tap to Speak. Pinch/Stretch to zoom",Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Tap to Speak. Pinch/Stretch to zoom", Toast.LENGTH_LONG).show();
     }
 
     private void requestCameraPermission() {
@@ -121,18 +121,22 @@ public class OCRActivity extends AppCompatActivity {
     private void createCameraSource(boolean autoFocus, boolean useFlash) {
         Context context = getApplicationContext();
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-        textRecognizer.setProcessor(new OcrDetectorProcessor(mGraphicOverlay, tvOcrResult));
-
+        OcrDetectorProcessor processor = new OcrDetectorProcessor(mGraphicOverlay, tvOcrResult);
+        Log.e(TAG, "识别到的数据>>>>>>>: " + processor.getOcrText());
+        mCameraSource =
+                new CameraSource.Builder(getApplicationContext(), textRecognizer)
+                        .setFacing(CameraSource.CAMERA_FACING_BACK)
+                        .setRequestedPreviewSize(1280, 1024)
+                        .setRequestedFps(2.0f)
+                        .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
+                        .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
+                        .build();
+        textRecognizer.setProcessor(processor);
         if (textRecognizer.isOperational()) {
-            mCameraSource =
-                    new CameraSource.Builder(getApplicationContext(), textRecognizer)
-                            .setFacing(CameraSource.CAMERA_FACING_BACK)
-                            .setRequestedPreviewSize(1280, 1024)
-                            .setRequestedFps(2.0f)
-                            .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
-                            .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
-                            .build();
         }
+
+
+
     }
 
 
@@ -171,7 +175,7 @@ public class OCRActivity extends AppCompatActivity {
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted - initialize the camera source");
             // we have permission, so create the camerasource
-            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus,false);
+            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
             boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
             createCameraSource(autoFocus, useFlash);
             return;

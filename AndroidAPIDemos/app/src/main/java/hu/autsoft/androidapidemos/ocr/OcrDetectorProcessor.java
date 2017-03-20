@@ -12,6 +12,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
 
     private GraphicOverlay<OcrGraphic> ocrGraphicOverlay;
     private TextView tvOcrResult;
+    private StringBuilder sb;
 
     public OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay, TextView tvOcrResult) {
         this.ocrGraphicOverlay = ocrGraphicOverlay;
@@ -22,16 +23,17 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
         ocrGraphicOverlay.clear();
         SparseArray<TextBlock> items = detections.getDetectedItems();
-        final StringBuilder sb = new StringBuilder();
+        sb = new StringBuilder();
         for (int i = 0; i < items.size(); ++i) {
             TextBlock item = items.valueAt(i);
             if (item != null && item.getValue() != null) {
                 Log.d("OcrDetectorProcessor", "Text detected! " + item.getValue());
-                sb.append(item.getValue()+"\n");
+                sb.append(item.getValue() + "\n");
             }
             OcrGraphic graphic = new OcrGraphic(ocrGraphicOverlay, item);
             ocrGraphicOverlay.add(graphic);
         }
+
 
         tvOcrResult.post(new Runnable() {
             @Override
@@ -41,8 +43,14 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
         });
     }
 
+
     @Override
     public void release() {
         ocrGraphicOverlay.clear();
+    }
+
+    public StringBuilder getOcrText() {
+        if (sb != null) return sb;
+        return null;
     }
 }

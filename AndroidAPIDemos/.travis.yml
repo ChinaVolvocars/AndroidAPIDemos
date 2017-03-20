@@ -1,0 +1,20 @@
+#第一步:Create .travis.yml 文件
+#第二步:配置
+#  环境配置
+language: android
+jdk: oraclejdk8
+#指定编译Android项目，需要用到的组件和工具
+android:
+  components:
+    # use the latest revision of Android SDK Tools
+    - platform-tools
+    - tools
+    # The BuildTools version used by your project
+    - build-tools-25.0.2
+    # The SDK version used to compile your project
+    - android-25
+    # Additional components
+    - extra-android-m2repository
+#最后加上需要执行的脚本，这里只需要build通过就可以了，如果还需要测试或者发布，就需要执行其他的脚本了。
+
+script: ./gradlew build
